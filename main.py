@@ -1,3 +1,6 @@
-from tkinter import Tk, BOTH, Canvas
+from funcs.graphics import Window
 
-print("Hello World")
+def main():
+    win = Window(800, 600)
+    win.wait_for_close()
+    
