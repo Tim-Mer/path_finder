@@ -4,6 +4,19 @@ class Point:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
+        
+    def __add__(self, value):
+        if type(value) == int:
+            value = Point(value, value)
+        return Point(self.x + value.x, self.y + value.y)
+    
+    def __subtract__(self, value):
+        if type(value) == int:
+            value = Point(value, value)
+        return Point(self.x - value.x, self.y - value.y)
+    
+    def __truediv__(self, value):
+        return Point(int(self.x/value), int(self.y/value))
 
 class Line:
     def __init__(self, p1: Point, p2: Point):
@@ -73,6 +86,13 @@ class Cell:
             self.win.draw_line(Line(top_left, top_right))
         if self.bottom:
             self.win.draw_line(Line(bottom_left, bottom_right))
+    
+    def midpoint(self, other):
+        return self + (self - other)/2
             
+    def draw_move(self, to_cell, undo=False):
+        colour = "red"
+        if undo:
+            colour = "grey"
         
         
