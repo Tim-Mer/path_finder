@@ -1,18 +1,12 @@
 from funcs.graphics import Window
-from funcs.cell import Cell
+from funcs.maze import Maze
 
 def main():
-    height = 800
-    width = 600
-    win = Window(height, width)
+    width = 704
+    height = 704
+    win = Window(width, height)
     
-    c1 = Cell(win)
-    c1.bottom = False
-    c1.draw(200, 200, 220, 220)
-    c2 = Cell(win)
-    c2.top = False
-    c2.draw(200, 250, 220, 270)
-    c1.draw_move(c2)
+    Maze(32, 32, 20, 20, 32, 32, win, 23)
     win.wait_for_close()
     
     
