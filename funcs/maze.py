@@ -14,12 +14,15 @@ class Maze:
         self.win = win
         
         self.cells = []
+        print("Creating Cells")
         self.create_cells()
         
+        print("Creating Entrance and Exit")
         self.break_entrance_and_exit()
         if seed is not None:
             random.seed(seed)
-            
+        
+        print("Breaking walls...")
         self.break_walls_r(self.num_cols, self.num_rows)
         
     def create_cells(self):
@@ -48,4 +51,6 @@ class Maze:
         self.draw_cell(self.num_cols-1, self.num_rows-1)
         
     def break_walls_r(self, i, j):
-        pass
+        options = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
+        i, j = random.choice(options)
+        
