@@ -4,7 +4,7 @@ import time
 import random
 
 class Maze:
-    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win: Window | None = None, seed=None):
+    def __init__(self, x1: int, y1: int, num_rows: int, num_cols: int, cell_size_x: int, cell_size_y: int, win: Window | None = None, seed=None):
         self.x1 = x1
         self.y1 = y1
         self.num_rows = num_rows
@@ -23,7 +23,8 @@ class Maze:
             random.seed(seed)
         
         print("Breaking walls...")
-        self.break_walls_r(int(self.num_cols/2)-1, int(self.num_rows/2)-1)
+        #self.break_walls_r(int(self.num_cols/2)-1, int(self.num_rows/2)-1)
+        self.break_walls_r(0,0)
         
     def create_cells(self):
         for i in range(self.num_cols):
@@ -52,20 +53,30 @@ class Maze:
         
     def break_walls_r(self, i: int, j: int):
         # Check if cell is visited
-        if self.cells[i][j].visited:
-                print("visited")
+        try:
+            if self.cells[i][j].visited:
                 return
+        except:
+            return
             
         # Visit self
         self.cells[i][j].visited = True
         
         # Possible directions
-        options = {"left": (i-1, j), "right": (i+1, j), "bottom": (i, j-1), "top": (i, j+1)}
-        opposites = {"left": "right", "right": "left", "bottom": "top", "top": "bottom"}
+        options = {"left": (i-1, j),
+                   "right": (i+1, j),
+                   "bottom": (i, j+1),
+                   "top": (i, j-1)}
+        
+        opposites = {"left": "right",
+                     "right": "left",
+                     "bottom": "top",
+                     "top": "bottom"}
         
         all_visited = False
             
         while not all_visited:
+            print("----------------------------------------------")
             visitable = 4
             for k in options.keys():
                 current_i, current_j = options[k]
@@ -75,7 +86,7 @@ class Maze:
                 except:
                     visitable -= 1
             print(f"visitable: {visitable}")
-            if visitable < 3:
+            if visitable < 1: # random.randrange(2, 4):
                 all_visited = True
             # Choose direction
             choice = random.choice(list(options.keys()))
@@ -83,13 +94,7 @@ class Maze:
             new_i, new_j = options[choice]
 
             # Confirm direction is valid and not visited
-            print(f"i: {i}, j: {j}\n")
-            if 0 > new_i  or new_i > self.num_rows-1:
-                print("EDGE i")
-                return
-            if 0 > new_j  or new_j > self.num_cols-1:
-                print("EDGE j")
-                return
+            print(f"i: {new_i}, j: {new_j}\n")
         
             # Break walls to new direction
             self.cells[i][j].directions[choice] = False
