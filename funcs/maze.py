@@ -23,8 +23,10 @@ class Maze:
             random.seed(seed)
         
         print("Breaking walls...")
-        #self.break_walls_r(int(self.num_cols/2)-1, int(self.num_rows/2)-1)
-        self.break_walls_r(0,0)
+        self.break_walls_r(int(self.num_cols/2)-1, int(self.num_rows/2)-1)
+        
+        print("Ressetting visited status")
+        self.reset_cells_visited()
         
     def create_cells(self):
         for i in range(self.num_cols):
@@ -52,11 +54,10 @@ class Maze:
         self.draw_cell(self.num_cols-1, self.num_rows-1)
         
     def break_walls_r(self, i: int, j: int):
+        if 0 > i or i > self.num_cols-1 or 0 > j or j > self.num_rows-1:
+            return
         # Check if cell is visited
-        try:
-            if self.cells[i][j].visited:
-                return
-        except:
+        if self.cells[i][j].visited:
             return
             
         # Visit self
@@ -73,33 +74,30 @@ class Maze:
                      "bottom": "top",
                      "top": "bottom"}
         
-        all_visited = False
-            
-        while not all_visited:
+        choices = list(options.keys())
+        #for l in range(len(list(options.keys()))):
+        #    choices.append(random.choice(list(options.keys())))
+        
+                            
+        while len(choices):
             print("----------------------------------------------")
-            visitable = 4
-            for k in options.keys():
-                current_i, current_j = options[k]
-                try:
-                    if self.cells[current_i][current_j].visited:
-                        visitable -= 1
-                except:
-                    visitable -= 1
-            print(f"visitable: {visitable}")
-            if visitable < 1: # random.randrange(2, 4):
-                all_visited = True
             # Choose direction
-            choice = random.choice(list(options.keys()))
+            choice = choices.pop(random.randrange(len(choices)))
             print(f"Going: {choice}")
             new_i, new_j = options[choice]
 
-            # Confirm direction is valid and not visited
-            print(f"i: {new_i}, j: {new_j}\n")
-        
-            # Break walls to new direction
-            self.cells[i][j].directions[choice] = False
-            self.cells[new_i][new_j].directions[opposites[choice]] = False
-            self.draw_cell(i, j)
-            self.draw_cell(new_i, new_j)
-            time.sleep(0.01)
-            self.break_walls_r(new_i, new_j)
+            # Confirm direction is valid
+            print(f"i: {new_i}, j: {new_j}")
+            if not (0 > new_i or new_i > self.num_cols-1 or 0 > new_j or new_j > self.num_rows-1):
+                if self.cells[new_i][new_j].visited == False:
+                    # Break walls to new direction
+                    self.cells[i][j].directions[choice] = False
+                    self.cells[new_i][new_j].directions[opposites[choice]] = False
+                    self.draw_cell(i, j)
+                    self.draw_cell(new_i, new_j)
+                    self.break_walls_r(new_i, new_j)
+
+    def reset_cells_visited(self):
+        for i in range(self.num_cols-1):
+            for j in range(self.num_rows-1):
+                self.cells[i][j].visited = False
