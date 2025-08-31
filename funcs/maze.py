@@ -13,19 +13,25 @@ class Maze:
         self.cell_size_y = cell_size_y
         self.win = win
         
+        DEBUG = True
+        
+        
         self.cells = []
-        print("Creating Cells")
+        if DEBUG:
+            print("Creating Cells")
         self.create_cells()
         
-        print("Creating Entrance and Exit")
+        if DEBUG:
+            print("Creating Entrance and Exit")
         self.break_entrance_and_exit()
         if seed is not None:
             random.seed(seed)
-        
-        print("Breaking walls...")
+        if DEBUG:
+            print("Breaking walls...")
         self.break_walls_r(int(self.num_cols/2)-1, int(self.num_rows/2)-1)
         
-        print("Ressetting visited status")
+        if DEBUG:
+            print("Ressetting visited status")
         self.reset_cells_visited()
         
     def create_cells(self):
@@ -45,12 +51,12 @@ class Maze:
         if self.win is None:
             return
         self.win.redraw()
-        #time.sleep(0.01)
+        time.sleep(0.01)
         
     def break_entrance_and_exit(self):
-        self.cells[0][0].directions["top"] = False
+        self.cells[0][0].walls["top"] = False
         self.draw_cell(0,0)
-        self.cells[self.num_cols-1][self.num_rows-1].directions["bottom"] = False
+        self.cells[self.num_cols-1][self.num_rows-1].walls["bottom"] = False
         self.draw_cell(self.num_cols-1, self.num_rows-1)
         
     def break_walls_r(self, i: int, j: int):
@@ -75,29 +81,63 @@ class Maze:
                      "top": "bottom"}
         
         choices = list(options.keys())
-        #for l in range(len(list(options.keys()))):
-        #    choices.append(random.choice(list(options.keys())))
-        
-                            
         while len(choices):
-            print("----------------------------------------------")
             # Choose direction
             choice = choices.pop(random.randrange(len(choices)))
-            print(f"Going: {choice}")
             new_i, new_j = options[choice]
 
             # Confirm direction is valid
-            print(f"i: {new_i}, j: {new_j}")
             if not (0 > new_i or new_i > self.num_cols-1 or 0 > new_j or new_j > self.num_rows-1):
                 if self.cells[new_i][new_j].visited == False:
                     # Break walls to new direction
-                    self.cells[i][j].directions[choice] = False
-                    self.cells[new_i][new_j].directions[opposites[choice]] = False
+                    self.cells[i][j].walls[choice] = False
+                    self.cells[new_i][new_j].walls[opposites[choice]] = False
                     self.draw_cell(i, j)
                     self.draw_cell(new_i, new_j)
                     self.break_walls_r(new_i, new_j)
 
     def reset_cells_visited(self):
-        for i in range(self.num_cols-1):
-            for j in range(self.num_rows-1):
+        for i in range(self.num_cols):
+            for j in range(self.num_rows):
                 self.cells[i][j].visited = False
+                
+    def __repr__(self):
+        rows = []
+        for i in range(self.num_rows):
+            row = []
+            for j in range(self.num_cols):
+                row.append(f"Cell: [{i}][{j}]\n{self.cells[i][j]}\n")
+            rows.append("".join(row))
+        return "".join(rows)
+    
+    def solve(self):
+        return self._solve_r(0,0)
+        
+    def _solve_r(self, i, j):
+        self.animate()
+        self.cells[i][j].visited = True
+        if i == self.num_cols-1 and j == self.num_rows-1:
+            return True
+
+        # Possible directions
+        options = {"left": (i-1, j),
+                   "right": (i+1, j),
+                   "bottom": (i, j+1),
+                   "top": (i, j-1)}
+        choices = list(options.keys())
+        while len(choices):
+            direction = choices.pop(random.randrange(len(choices)))
+            new_i, new_j = options[direction]
+            # Check if move is valid
+            if (
+                0 <= new_i <= self.num_cols-1 and
+                0 <= new_j <= self.num_rows-1 and
+                not self.cells[i][j].walls[direction] and
+                not self.cells[new_i][new_j].visited
+            ):
+                self.cells[i][j].draw_move(self.cells[new_i][new_j])
+                if self._solve_r(new_i, new_j):
+                    return True
+                else:
+                    self.cells[i][j].draw_move(self.cells[new_i][new_j], True)
+        return False

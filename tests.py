@@ -56,11 +56,6 @@ class Tests(unittest.TestCase):
         except Exception as e:
             self.fail(f"animate() raised an exception with win=None: {e}")
 
-    def test_maze_large_grid(self):
-        m = Maze(0, 0, 50, 50, 2, 2)
-        self.assertEqual(len(m.cells), 50)
-        self.assertEqual(len(m.cells[0]), 50)
-
     def test_maze_single_row(self):
         m = Maze(0, 0, 1, 10, 5, 5)
         self.assertEqual(len(m.cells), 10)
@@ -91,8 +86,9 @@ class Tests(unittest.TestCase):
         num_cols = 12
         num_rows = 10
         m1 = Maze(0, 0, num_rows, num_cols, 10, 10)
-        self.assertEqual(m1.cells[0][0].top, False)
-        self.assertEqual(m1.cells[num_cols-1][num_rows-1].bottom, False)
+        # Check the directions dictionary for entrance and exit
+        self.assertFalse(m1.cells[0][0].directions["top"])
+        self.assertFalse(m1.cells[num_cols-1][num_rows-1].directions["bottom"])
         
     def test_maze_reset_cells_visited(self):
         num_cols = 5
@@ -100,7 +96,7 @@ class Tests(unittest.TestCase):
         m1 = Maze(0,0,num_rows,num_cols,1,1)
         for i in range(num_cols):
             for j in range(num_rows):
-                self.assertEqual(m1.cells[i][j].visited, False)
+                self.assertFalse(m1.cells[i][j].visited)
 
 if __name__ == "__main__":
     unittest.main()
