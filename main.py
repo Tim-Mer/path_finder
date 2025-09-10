@@ -1,12 +1,15 @@
 from funcs.graphics import Window
 from funcs.maze import Maze
+import sys
+
 
 def main():
-    width = 704
+    width = 1408
     height = 704
     win = Window(width, height)
+    sys.setrecursionlimit(10**6)
     
-    m1 = Maze(32, 32, 20, 20, 32, 32, win)
+    m1 = Maze(32, 32, 80, 160, 8, 8, win)
     print("Solving Maze")
     m1.solve()
     
